@@ -1,2 +1,5 @@
 transformers
 tensorflow
+bert-extractive-summarizer
+sentencepiece
+flask
