@@ -2,7 +2,6 @@ import tensorflow as tf
 import transformers as ts
 from bert_score import score
 from summarizer import TransformerSummarizer
-import tensorflow_hub as hub
 
 def initialize_models():
     model_name = 'facebook/bart-large-cnn'
@@ -35,35 +34,49 @@ def pegasus_analysis(pegasus_summarizer, input_text):
     pipe_out = pegasus_summarizer(input_text)
     return pipe_out[0]['summary_text']
 
-input_text = """
-    Researchers have discovered a new species of dinosaur in Argentina, which they believe is 
-    the oldest-known member of the titanosaur group. The dinosaur lived 140 million years ago 
-    and measured about 20 feet long. It has been named Ninjatitan zapatai in honor of Argentine 
-    paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
-    """
+def analyze():
+    input_text = """
+        Researchers have discovered a new species of dinosaur in Argentina, which they believe is 
+        the oldest-known member of the titanosaur group. The dinosaur lived 140 million years ago 
+        and measured about 20 feet long. It has been named Ninjatitan zapatai in honor of Argentine 
+        paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
+        """
 
-bart_summarizer, gpt_summarizer, xlnet_summarizer, pegasus_summarizer = initialize_models()
-print("Models created")
-bart_summary = bart_analysis(bart_summarizer, input_text)
-bart_score = get_score(input_text, bart_summary)
-print("**************")
-print("Bart Summary: " + bart_summary)
-print("Bart Score: " + str(bart_score * 100))
+    bart_summarizer, gpt_summarizer, xlnet_summarizer, pegasus_summarizer = initialize_models()
+    print("Models created")
+    bart_summary = bart_analysis(bart_summarizer, input_text)
+    bart_score = get_score(input_text, bart_summary)
+    print("**************")
+    print("Bart Summary: " + bart_summary)
+    print("Bart Score: " + str(bart_score * 100))
 
-print("**************")
-gpt_summary = gpt_analysis(gpt_summarizer, input_text)
-gpt_score = get_score(input_text, gpt_summary)
-print("GPT Summary: " + gpt_summary)
-print("GPT Score: " + str(gpt_score * 100))
+    print("**************")
+    gpt_summary = gpt_analysis(gpt_summarizer, input_text)
+    gpt_score = get_score(input_text, gpt_summary)
+    print("GPT Summary: " + gpt_summary)
+    print("GPT Score: " + str(gpt_score * 100))
 
-print("**************")
-xlnet_summary = xlnet_analysis(xlnet_summarizer, input_text)
-xlnet_score = get_score(input_text, xlnet_summary)
-print("XLNet Summary: " + xlnet_summary)
-print("XLNet Score: " + str(xlnet_score * 100))
+    print("**************")
+    xlnet_summary = xlnet_analysis(xlnet_summarizer, input_text)
+    xlnet_score = get_score(input_text, xlnet_summary)
+    print("XLNet Summary: " + xlnet_summary)
+    print("XLNet Score: " + str(xlnet_score * 100))
 
-print("**************")
-pegasus_summary = pegasus_analysis(pegasus_summarizer, input_text)
-pegasus_score = get_score(input_text, pegasus_summary)
-print("Pegasus summary: " + pegasus_summary)
-print("Pegasus score: " + str(pegasus_score * 100))
+    print("**************")
+    pegasus_summary = pegasus_analysis(pegasus_summarizer, input_text)
+    pegasus_score = get_score(input_text, pegasus_summary)
+    print("Pegasus summary: " + pegasus_summary)
+    print("Pegasus score: " + str(pegasus_score * 100))
+
+def summarize(keyword):
+    print("You entered: " + keyword)
+    input_text = """
+        Researchers have discovered a new species of dinosaur in Argentina, which they believe is 
+        the oldest-known member of the titanosaur group. The dinosaur lived 140 million years ago 
+        and measured about 20 feet long. It has been named Ninjatitan zapatai in honor of Argentine 
+        paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
+        """
+    pegasus_summarizer = ts.pipeline("summarization", model = "google/pegasus-cnn_dailymail", max_length=100)
+    pipe_out = pegasus_summarizer(input_text)
+    summary = pipe_out[0]['summary_text']
+    return summary
