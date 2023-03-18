@@ -26,13 +26,13 @@
             }
         </style>
         <script>
-            function getSummary() {
+            function getClassification() {
                 var keyword = document.getElementById("keyword").value
-                var url = '/getSummary?keyword=' + keyword 
+                var url = '/getClassification?keyword=' + keyword 
                 fetch(url)
                 .then(response => response.text())
                 .then(text => {
-                    document.getElementById("summary").value = text;
+                    document.getElementById("label").value = text;
                 })
                 .catch(error => console.error(error));
             }
@@ -66,19 +66,19 @@
         <img class="background" src="../static/background.png" alt="Aleq">
         <div class="card center">
             <div class="card-header">
-                Summarizer
+                Classifier
             </div>
             <div class="card-body">
-                <p class="card-text">Type in keyword to summarize tweets below</p>
+                <p class="card-text">Type in keyword to classify tweets below</p>
                 <div class="mb-3">
                     <label for="exampleFormControlInput1" class="form-label">Keyword</label>
                     <input type="text" class="form-control" id="keyword" placeholder="Enter keyword here">
                 </div>
                 <div class="mb-3">
-                    <label for="exampleFormControlTextarea1" class="form-label">Summary</label>
-                    <textarea class="form-control" id="summary" rows="5"></textarea>
+                    <label for="exampleFormControlTextarea1" class="form-label">Classification</label>
+                    <textarea class="form-control" id="label" rows="5"></textarea>
                 </div>
-                <button class="btn btn-primary" onclick="getSummary()">Summarize</a>
+                <button class="btn btn-primary" onclick="getClassification()">Classify</a>
             </div>
           </div>
     </body>

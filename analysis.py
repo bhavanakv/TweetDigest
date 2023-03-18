@@ -63,7 +63,7 @@ def analyze():
     print("XLNet Score: " + str(xlnet_score * 100))
 
     print("**************")
-    pegasus_summary = pegasus_analysis(pegasus_summarizer, input_text)
+    pegasus_summary = pegasus_analysis(pegasus_summarizer, input_text).replace(".<n>",". ")
     pegasus_score = get_score(input_text, pegasus_summary)
     print("Pegasus summary: " + pegasus_summary)
     print("Pegasus score: " + str(pegasus_score * 100))
@@ -76,7 +76,20 @@ def summarize(keyword):
         and measured about 20 feet long. It has been named Ninjatitan zapatai in honor of Argentine 
         paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
         """
-    pegasus_summarizer = ts.pipeline("summarization", model = "google/pegasus-cnn_dailymail", max_length=100)
+    pegasus_summarizer = ts.pipeline("summarization", model = "google/pegasus-cnn_dailymail", max_length = 100)
     pipe_out = pegasus_summarizer(input_text)
-    summary = pipe_out[0]['summary_text']
+    summary = pipe_out[0]['summary_text'].replace(".<n>",". ")
     return summary
+
+def classify(keyword):
+    cache_dir = 'cache/'
+    input_text = """
+        Researchers have discovered a new species of dinosaur in Argentina, which they believe is 
+        the oldest-known member of the titanosaur group. The dinosaur lived 140 million years ago 
+        and measured about 20 feet long. It has been named Ninjatitan zapatai in honor of Argentine 
+        paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
+        """
+    classifier = ts.pipeline('zero-shot-classification', cache_dir=cache_dir)
+    labels = ['politics', 'sports', 'science', 'finance', 'entertainment']
+    response = classifier(input_text, labels)
+    return response
