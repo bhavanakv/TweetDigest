@@ -15,8 +15,7 @@
                 filter: blur(5px);
             }
             .card {
-                left: 100px;
-                top: 100px;
+                top: 250px;
                 width: 40rem;
             }
             .btn-primary {
@@ -59,27 +58,32 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/classify" style="color:#01AC2C;">Classify</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/analyze" style="color:#01AC2C;">Sentiment Analysis</a>
+                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
         <img class="background" src="../static/background.png" alt="Aleq">
-        <div class="card center">
-            <div class="card-header">
-                Summarizer
-            </div>
-            <div class="card-body">
-                <p class="card-text">Type in keyword to summarize tweets below</p>
-                <div class="mb-3">
-                    <label for="exampleFormControlInput1" class="form-label">Keyword</label>
-                    <input type="text" class="form-control" id="keyword" placeholder="Enter keyword here">
+        <div class="d-flex flex-row justify-content-center align-items-center" style="height: 100px;">
+            <div class="card">
+                <div class="card-header">
+                    Summarizer
                 </div>
-                <div class="mb-3">
-                    <label for="exampleFormControlTextarea1" class="form-label">Summary</label>
-                    <textarea class="form-control" id="summary" rows="5"></textarea>
+                <div class="card-body">
+                    <p class="card-text">Type in keyword to summarize tweets below</p>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Keyword</label>
+                        <input type="text" class="form-control" id="keyword" placeholder="Enter keyword here">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlTextarea1" class="form-label">Summary</label>
+                        <textarea class="form-control" id="summary" rows="5"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="getSummary()">Summarize</a>
                 </div>
-                <button class="btn btn-primary" onclick="getSummary()">Summarize</a>
             </div>
-          </div>
+        </div>
     </body>
 </html>

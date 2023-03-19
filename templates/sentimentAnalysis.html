@@ -14,33 +14,28 @@
                 -webkit-filter: blur(5px); /* Safari 6.0 - 9.0 */
                 filter: blur(5px);
             }
-            h1.foreground {
-                color: rgb(221, 217, 217);
-                position: absolute;
-                left: 200px;
-                top: 200px;
-            }
-            h5.foreground {
-                color: rgb(221, 217, 217);
-                position: absolute;
-                left: 340px;
-                top: 400px;
-            }
-            h6.foreground {
-                color: rgb(221, 217, 217);
-                position: absolute;
-                left: 105px;
-                top: 260px;
+            .card {
+                top: 250px;
+                width: 40rem;
             }
             .btn-primary {
                 background-color: #009525 !important;
                 border-color: #009525 !important;
                 color: rgb(221, 217, 217) !important;
-                position: absolute;
-                left: 353px;
-                top: 440px;
             }
         </style>
+        <script>
+            function getClassification() {
+                var keyword = document.getElementById("keyword").value
+                var url = '/getSentimentAnalysis?keyword=' + keyword 
+                fetch(url)
+                .then(response => response.text())
+                .then(text => {
+                    document.getElementById("label").value = text;
+                })
+                .catch(error => console.error(error));
+            }
+            </script>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg bg-body-tertiary" style="overflow:auto">
@@ -71,9 +66,24 @@
             </div>
         </nav>
         <img class="background" src="../static/background.png" alt="Aleq">
-        <h1 class="foreground">Welcome to TweetDigest!</h1>
-        <h6 class="foreground">TweetDigest is an automatic summarizer tool with an ability to summarize and classify tweets.</h6>
-        <h5 class="foreground">Try it now for free!</h5>
-        <a type="button" class="btn btn-primary" href="/summarize">Summarize now!</button>
+        <div class="d-flex flex-row justify-content-center align-items-center" style="height: 100px;">
+            <div class="card center">
+                <div class="card-header">
+                    Sentiment Analyzer
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Type in keyword to analyze tweets below</p>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Keyword</label>
+                        <input type="text" class="form-control" id="keyword" placeholder="Enter keyword here">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlTextarea1" class="form-label">Sentiment Analysis</label>
+                        <textarea class="form-control" id="label" rows="5"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="getClassification()">Analyze</a>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

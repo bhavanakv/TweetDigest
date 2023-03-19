@@ -93,3 +93,16 @@ def classify(keyword):
     labels = ['politics', 'sports', 'science', 'finance', 'entertainment']
     response = classifier(input_text, labels)
     return response
+
+def sentimentAnalysis(keyword):
+    cache_dir = 'cache/'
+    input_text = """
+        Researchers have discovered a new species of dinosaur in Argentina, which they believe is 
+        the oldest-known member of the titanosaur group. The dinosaur lived 140 million years ago 
+        and measured about 20 feet long. It has been named Ninjatitan zapatai in honor of Argentine 
+        paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
+        """
+    classifier = ts.pipeline('zero-shot-classification', cache_dir=cache_dir)
+    labels = ['positive', 'negative']
+    response = classifier(input_text, labels)
+    return response
