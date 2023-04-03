@@ -2,6 +2,7 @@ import tensorflow as tf
 import transformers as ts
 from bert_score import score
 from summarizer import TransformerSummarizer
+import tweets
 
 def initialize_models():
     model_name = 'facebook/bart-large-cnn'
@@ -68,6 +69,18 @@ def analyze():
     print("Pegasus summary: " + pegasus_summary)
     print("Pegasus score: " + str(pegasus_score * 100))
 
+def summarize_bart(keyword):
+    model_name = 'facebook/bart-large-cnn'
+    cache_dir = 'cache/'
+    tokenizer = ts.AutoTokenizer.from_pretrained(model_name, cache_dir = cache_dir)
+    model = ts.TFAutoModelForSeq2SeqLM.from_pretrained(model_name, cache_dir = cache_dir)
+    bart_summarizer = ts.pipeline("summarization", model=model, tokenizer=tokenizer)
+    tweets_data = tweets.get_tweets(keyword) 
+    bart_summary = bart_analysis(bart_summarizer, tweets_data)
+    bart_score = get_score(tweets_data, bart_summary)
+    print(bart_score)
+    return bart_summary
+
 def summarize(keyword):
     print("You entered: " + keyword)
     input_text = """
@@ -77,11 +90,15 @@ def summarize(keyword):
         paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
         """
     pegasus_summarizer = ts.pipeline("summarization", model = "google/pegasus-cnn_dailymail", max_length = 100)
-    pipe_out = pegasus_summarizer(input_text)
+    tweets_data = tweets.get_tweets(keyword) 
+    print('Starting to summarize')
+    pipe_out = pegasus_summarizer(tweets_data)
     summary = pipe_out[0]['summary_text'].replace(".<n>",". ")
+    print('Summarization done')
     return summary
 
 def classify(keyword):
+    print("Method beginning")
     cache_dir = 'cache/'
     input_text = """
         Researchers have discovered a new species of dinosaur in Argentina, which they believe is 
@@ -91,7 +108,10 @@ def classify(keyword):
         """
     classifier = ts.pipeline('zero-shot-classification', cache_dir=cache_dir)
     labels = ['politics', 'sports', 'science', 'finance', 'entertainment']
-    response = classifier(input_text, labels)
+    tweets_data = tweets.get_tweets(keyword)
+    print("Starting to classify")
+    response = classifier(tweets_data, labels)
+    print("Classification done")
     return response
 
 def sentimentAnalysis(keyword):
@@ -104,5 +124,6 @@ def sentimentAnalysis(keyword):
         """
     classifier = ts.pipeline('zero-shot-classification', cache_dir=cache_dir)
     labels = ['positive', 'negative']
-    response = classifier(input_text, labels)
+    tweets_data = tweets.get_tweets(keyword)
+    response = classifier(tweets_data, labels)
     return response

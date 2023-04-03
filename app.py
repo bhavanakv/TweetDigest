@@ -22,23 +22,25 @@ def analyze():
 @app.route("/getSummary")
 def getSummary():
     keyword = request.args.get('keyword')
-    summary = analysis.summarize(keyword)
+    summary = analysis.summarize_bart(keyword)
     return summary
 
 @app.route("/getClassification")
 def getClassification():
     keyword = request.args.get('keyword')
     response = analysis.classify(keyword)
+    print(response)
     labels = response['labels']
-    scores = response['scores']
+    scores = [score * 100 for score in response['scores']]
     classified_labels = []
     for i in range(len(scores)):
         if scores[i] >= 40:
             classified_labels.append(labels[i])
+    print(classified_labels)
     if len(classified_labels) == 0:
         max_val = max(scores)
         for i in range(len(scores)):
-            if scores[i] >= max_val:
+            if scores[i] >= max_val or abs(max_val - scores[i]) <= 3:
                 classified_labels.append(labels[i])
     classified_labels = '\n'.join(classified_labels)
     return classified_labels

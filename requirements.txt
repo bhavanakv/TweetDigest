@@ -3,3 +3,4 @@ tensorflow
 bert-extractive-summarizer
 sentencepiece
 flask
+snscrape
