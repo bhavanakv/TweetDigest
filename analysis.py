@@ -3,6 +3,11 @@ import transformers as ts
 from bert_score import score
 from summarizer import TransformerSummarizer
 import tweets
+import logging
+
+logger = logging.getLogger("analysis")
+logging.basicConfig(level=logging.DEBUG)
+logger.setLevel('DEBUG')
 
 def initialize_models():
     model_name = 'facebook/bart-large-cnn'
@@ -72,29 +77,30 @@ def analyze():
 def summarize_bart(keyword):
     model_name = 'facebook/bart-large-cnn'
     cache_dir = 'cache/'
+    logging.debug("***Starting to create model and summarize***")
     tokenizer = ts.AutoTokenizer.from_pretrained(model_name, cache_dir = cache_dir)
     model = ts.TFAutoModelForSeq2SeqLM.from_pretrained(model_name, cache_dir = cache_dir)
     bart_summarizer = ts.pipeline("summarization", model=model, tokenizer=tokenizer)
+    logging.debug("***Fetching tweets***")
     tweets_data = tweets.get_tweets(keyword) 
     bart_summary = bart_analysis(bart_summarizer, tweets_data)
-    bart_score = get_score(tweets_data, bart_summary)
-    print(bart_score)
+    logging.info("***Completed generating summary and returning the summary***")
     return bart_summary
 
 def summarize(keyword):
-    print("You entered: " + keyword)
     input_text = """
         Researchers have discovered a new species of dinosaur in Argentina, which they believe is 
         the oldest-known member of the titanosaur group. The dinosaur lived 140 million years ago 
         and measured about 20 feet long. It has been named Ninjatitan zapatai in honor of Argentine 
         paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
         """
+    logging.debug("***Starting to create model and summarize***")
     pegasus_summarizer = ts.pipeline("summarization", model = "google/pegasus-cnn_dailymail", max_length = 100)
     tweets_data = tweets.get_tweets(keyword) 
-    print('Starting to summarize')
+    logging.debug("***Fetching tweets***")
     pipe_out = pegasus_summarizer(tweets_data)
     summary = pipe_out[0]['summary_text'].replace(".<n>",". ")
-    print('Summarization done')
+    logging.info("***Completed generating summary and returning the summary***")
     return summary
 
 def classify(keyword):
@@ -106,12 +112,13 @@ def classify(keyword):
         and measured about 20 feet long. It has been named Ninjatitan zapatai in honor of Argentine 
         paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
         """
+    logging.debug("***Starting to create model and classify***")
     classifier = ts.pipeline('zero-shot-classification', cache_dir=cache_dir)
     labels = ['politics', 'sports', 'science', 'finance', 'entertainment']
     tweets_data = tweets.get_tweets(keyword)
-    print("Starting to classify")
+    logging.debug("***Fetching tweets***")
     response = classifier(tweets_data, labels)
-    print("Classification done")
+    logging.info("***Completed generating summary and returning the summary***")
     return response
 
 def sentimentAnalysis(keyword):
@@ -122,8 +129,11 @@ def sentimentAnalysis(keyword):
         and measured about 20 feet long. It has been named Ninjatitan zapatai in honor of Argentine 
         paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
         """
+    logging.debug("***Starting to create model and analyze***")
     classifier = ts.pipeline('zero-shot-classification', cache_dir=cache_dir)
     labels = ['positive', 'negative']
+    logging.debug("***Fetching tweets***")
     tweets_data = tweets.get_tweets(keyword)
     response = classifier(tweets_data, labels)
+    logging.info("***Completed generating summary and returning the summary***")
     return response
