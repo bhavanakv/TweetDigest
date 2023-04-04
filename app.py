@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-import analysis
+import service
 import logging
 
 app = Flask(__name__)
@@ -50,7 +50,7 @@ def getSummary():
     keyword = request.args.get('keyword')
     logger.debug("***Received request to summarize for keyword: {}***".format(keyword))
     # Calling function to summarize
-    summary = analysis.summarize_bart(keyword)
+    summary = service.summarize_bart(keyword)
     logger.debug(f"***Summary for keywword: {keyword} -> {summary}***")
     return summary
 
@@ -64,7 +64,7 @@ def getClassification():
     keyword = request.args.get('keyword')
     logger.debug(f"***Received request to classify for keyword: {keyword}***")
     # Calling function to classify that returns classified labels and their corresponding scores
-    response = analysis.classify(keyword)
+    response = service.classify(keyword)
     logger.info(f"***Response from classifier: {response}***")
     labels = response['labels']
     # Converting the score to scale of 100
@@ -95,7 +95,7 @@ def getSentimentAnalysis():
     keyword = request.args.get('keyword')
     logger.debug(f"***Received request to analyze for keyword: {keyword}***")
     # Calling function to classify that returns classified labels and their corresponding scores
-    response = analysis.sentimentAnalysis(keyword)
+    response = service.sentimentAnalysis(keyword)
     labels = response['labels']
     scores = response['scores']
     logger.info(f"***Response from classifier: {response}***")
