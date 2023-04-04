@@ -9,6 +9,10 @@ logger = logging.getLogger("analysis")
 logging.basicConfig(level=logging.DEBUG)
 logger.setLevel('DEBUG')
 
+"""
+Function to initialize all the models
+@return: all models namely bart, gpt, xlnet and pegasus
+"""
 def initialize_models():
     model_name = 'facebook/bart-large-cnn'
     cache_dir = 'cache/'
@@ -20,26 +24,54 @@ def initialize_models():
     pegasus_summarizer = ts.pipeline("summarization", model = "google/pegasus-cnn_dailymail", max_length=100)
     return bart_summarizer, gpt_summarizer, xlnet_summarizer, pegasus_summarizer
 
+"""
+Function to calculate accuracy of summary
+@param: Text to be summarized, summary generated
+@return: score 
+"""
 def get_score(input_text, summary):
     _,_,f1 = score([summary], [input_text], lang='en', verbose=False)
     return f1.item()
 
+"""
+Function to create summary using bart model
+@param: bart model, text to be summarized
+@return: summary generated
+"""
 def bart_analysis(bart_summarizer, input_text):
     summary = bart_summarizer(input_text, batch_size = 3, max_length = 100, min_length = 20, do_sample = False, num_beams = 4, max_time = 5, length_penalty = 4.0)[0]['summary_text']
     return summary
 
+"""
+Function to create summary using GPT2 model
+@param: gpt model, text to be summarized
+@return: summary generated
+"""
 def gpt_analysis(gpt_summarizer, input_text):
     summary = ''.join(gpt_summarizer(input_text, min_length=20, max_length=100))
     return summary
 
+"""
+Function to create summary using XLNet model
+@param: xlnet model, text to be summarized
+@return: summary generated
+"""
 def xlnet_analysis(xlnet_summarizer, input_text):
     summary = ''.join(xlnet_summarizer(input_text, min_length=20, max_length=100))
     return summary
 
+"""
+Function to create summary using Pegasus model
+@param: pegasus model, text to be summarized
+@return: summary generated
+"""
 def pegasus_analysis(pegasus_summarizer, input_text):
     pipe_out = pegasus_summarizer(input_text)
     return pipe_out[0]['summary_text']
 
+"""
+Function that performs analysis and displays accuracy of all the models being compared
+"""
 def analyze():
     input_text = """
         Researchers have discovered a new species of dinosaur in Argentina, which they believe is 
@@ -74,66 +106,81 @@ def analyze():
     print("Pegasus summary: " + pegasus_summary)
     print("Pegasus score: " + str(pegasus_score * 100))
 
+"""
+Function used by flask app to generate summary using bart model for tweets based on keyword
+@param: keyword entered by user
+@return: summary generated
+"""
 def summarize_bart(keyword):
     model_name = 'facebook/bart-large-cnn'
     cache_dir = 'cache/'
     logging.debug("***Starting to create model and summarize***")
+    # Models to perform summarization
     tokenizer = ts.AutoTokenizer.from_pretrained(model_name, cache_dir = cache_dir)
     model = ts.TFAutoModelForSeq2SeqLM.from_pretrained(model_name, cache_dir = cache_dir)
     bart_summarizer = ts.pipeline("summarization", model=model, tokenizer=tokenizer)
     logging.debug("***Fetching tweets***")
+    # Calling function to fetch tweets
     tweets_data = tweets.get_tweets(keyword) 
+    # Summarizing tweets fetched and returning summary
     bart_summary = bart_analysis(bart_summarizer, tweets_data)
     logging.info("***Completed generating summary and returning the summary***")
     return bart_summary
 
+"""
+Function used by flask app to generate summary using pegasus model for tweets based on keyword
+@param: keyword entered by user
+@return: summary generated
+"""
 def summarize(keyword):
-    input_text = """
-        Researchers have discovered a new species of dinosaur in Argentina, which they believe is 
-        the oldest-known member of the titanosaur group. The dinosaur lived 140 million years ago 
-        and measured about 20 feet long. It has been named Ninjatitan zapatai in honor of Argentine 
-        paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
-        """
     logging.debug("***Starting to create model and summarize***")
+    # Model to perform summarization
     pegasus_summarizer = ts.pipeline("summarization", model = "google/pegasus-cnn_dailymail", max_length = 100)
+    # Calling function to fetch tweets
     tweets_data = tweets.get_tweets(keyword) 
     logging.debug("***Fetching tweets***")
+    # Summarizing tweets fetched and returning summary
     pipe_out = pegasus_summarizer(tweets_data)
     summary = pipe_out[0]['summary_text'].replace(".<n>",". ")
     logging.info("***Completed generating summary and returning the summary***")
     return summary
 
+"""
+Function used by flask app to classify tweets based on keyword
+@param: keyword entered by user
+@return: classifier response
+"""
 def classify(keyword):
-    print("Method beginning")
     cache_dir = 'cache/'
-    input_text = """
-        Researchers have discovered a new species of dinosaur in Argentina, which they believe is 
-        the oldest-known member of the titanosaur group. The dinosaur lived 140 million years ago 
-        and measured about 20 feet long. It has been named Ninjatitan zapatai in honor of Argentine 
-        paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
-        """
     logging.debug("***Starting to create model and classify***")
+    # Model to perform classification
     classifier = ts.pipeline('zero-shot-classification', cache_dir=cache_dir)
+    # Labels that tweets will be classified into
     labels = ['politics', 'sports', 'science', 'finance', 'entertainment']
+    # Calling function to fetch tweets
     tweets_data = tweets.get_tweets(keyword)
     logging.debug("***Fetching tweets***")
+    # Classifying the tweets received and returning classifier response
     response = classifier(tweets_data, labels)
     logging.info("***Completed generating summary and returning the summary***")
     return response
 
+"""
+Function used by flask app to perform sentiment analysis on tweets based on keyword
+@param: keyword entered by user
+@return: classifier response
+"""
 def sentimentAnalysis(keyword):
     cache_dir = 'cache/'
-    input_text = """
-        Researchers have discovered a new species of dinosaur in Argentina, which they believe is 
-        the oldest-known member of the titanosaur group. The dinosaur lived 140 million years ago 
-        and measured about 20 feet long. It has been named Ninjatitan zapatai in honor of Argentine 
-        paleontologist Sebastian Apesteguia, who is also known as "The Ninja".
-        """
     logging.debug("***Starting to create model and analyze***")
+    # Model to perform sentiment analysis
     classifier = ts.pipeline('zero-shot-classification', cache_dir=cache_dir)
+    # Labels that tweets will be classified into 
     labels = ['positive', 'negative']
+    # Calling function to fetch tweets
     logging.debug("***Fetching tweets***")
     tweets_data = tweets.get_tweets(keyword)
+    # Classifying the tweets received and returning classifier response
     response = classifier(tweets_data, labels)
     logging.info("***Completed generating summary and returning the summary***")
     return response
