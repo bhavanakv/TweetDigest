@@ -85,6 +85,14 @@ def getClassification():
     logger.info(f"***Classified labels: {classified_labels}***")
     return classified_labels
 
+@app.route("/getClassification/multi")
+def get_multiLevelClassification():
+    keyword = request.args.get('keyword')
+    logger.debug(f"***Received request to classify for keyword: {keyword}***")
+    response = service.multi_level_classify(keyword)
+    logger.info("Classification tree: \n" + response)
+    return response
+    
 """
 API to receive keyword from webpage and call the function that performs sentiment analysis on it
 @return: 'positive' or 'negative' depending on the sentiment analysis performed on the keyword
@@ -107,6 +115,14 @@ def getSentimentAnalysis():
         classified_label = labels[1]
     logger.info(f"***Classified label: {classified_label}***")
     return classified_label
+
+@app.route("/getEmotionalAnalysis")
+def getEmotionalAnalysis():
+    keyword = request.args.get('keyword')
+    logger.debug(f"***Received request to analyze for keyword: {keyword}***")
+    response = service.sentiment_emotional_analysis(keyword)
+    logger.info("Emotional analysis tree: \n" + response)
+    return response
 
 app.run()
 

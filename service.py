@@ -9,6 +9,27 @@ logging.basicConfig(level=logging.INFO)
 logger.setLevel('INFO')
 
 """
+Function to convert dictionary to text as a tree
+@param: Dictionary 
+@return: String as a tree
+"""
+def nested_dict_to_text(d, depth=0):
+    text = ""
+    for key, value in d.items():
+        # New element in the dictionary
+        text += "  " * depth + str(key) + ":\n"
+        # New element is a key
+        if isinstance(value, dict):
+            text += nested_dict_to_text(value, depth+1)
+        # New element is a list
+        elif isinstance(value, list):
+            for val in value:
+                text += "  " * (depth+1) + "- " + str(val) + "\n"
+        else:
+            text += "  " * (depth+1) + str(value) + "\n" 
+    return text
+
+"""
 Function used by flask app to generate summary using bart model for tweets based on keyword
 @param: keyword entered by user
 @return: summary generated
@@ -104,7 +125,7 @@ def multi_level_classify(keyword):
                 else:
                     classified_labels[label].append(response['labels'][i])
     logger.info("Classified tree: " + str(classified_labels))
-    return classified_labels
+    return nested_dict_to_text(classified_labels)
 
 """
 Function used by flask app to perform sentiment analysis on tweets based on keyword
@@ -133,8 +154,10 @@ Function used by flask app to perform sentiment analysis on tweets based on keyw
 """
 def sentiment_emotional_analysis(keyword):
     logging.info("***Starting to create model and analyze***")
+    # Models for sentiment and emotional analysis
     sentiment_analyzer = ts.pipeline('sentiment-analysis', model='distilbert-base-uncased')
     emotion_analyzer = ts.pipeline('zero-shot-classification')
+    # Tree and corresponding map to labels
     tree = {
         "Positive": ["happy", "excited", "love", "satisfied", "confident"],
         "Negative": ["angry", "sad", "disappointed", "anxious", "frustrated"],
@@ -145,13 +168,16 @@ def sentiment_emotional_analysis(keyword):
         'LABEL_1': 'Positive',
         'LABEL_2': 'Negative'
     }
-    tweets_data = 'US Election is going to be in 2024. The election is held accross the united states. The votes are collected and then counted and the next president is revealed. There would be lots of music and dancing once the winner is revealed.' + 'A famous pop star will be seen. All the fampus songs wil be played for everyone to watch'
+    tweets_data = 'I love playing with my dog'
     sentiment_label = label_dict[sentiment_analyzer(tweets_data)[0]['label']]
     response = emotion_analyzer(tweets_data, tree[sentiment_label])
     emotion_labels = []
+    # Best emotions are picked
     for i in range(len(response['scores'])):
         if response['scores'][i] > 0.2:
             emotion_labels.append(response['labels'][i])
     logger.info(f"Sentiment Label: {sentiment_label}, Emotional Labels: {emotion_labels}")
+    response_label = {}
+    response_label[sentiment_label] = emotion_labels
+    return nested_dict_to_text(response_label)
 
-sentiment_emotional_analysis('hello')

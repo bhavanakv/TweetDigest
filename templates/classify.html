@@ -35,6 +35,16 @@
                 })
                 .catch(error => console.error(error));
             }
+            function getMultiClassification() {
+                var keyword = document.getElementById("keyword").value
+                var url = '/getClassification/multi?keyword=' + keyword 
+                fetch(url)
+                .then(response => response.text())
+                .then(text => {
+                    document.getElementById("label").value = text;
+                })
+                .catch(error => console.error(error));
+            }
             </script>
     </head>
     <body>
@@ -81,7 +91,10 @@
                         <label for="exampleFormControlTextarea1" class="form-label">Classification</label>
                         <textarea class="form-control" id="label" rows="5"></textarea>
                     </div>
-                    <button class="btn btn-primary" onclick="getClassification()">Classify</a>
+                    <button class="btn btn-primary" onclick="getClassification()">Classify</a></button>
+                    <br>
+                    <br>
+                    <button class="btn btn-primary" onclick="getMultiClassification()">Multi-level Classify</a></button>
                 </div>
             </div>
         </div>
