@@ -16,12 +16,19 @@ Once the models are developed, the models are evaluated for pre-fetched tweets t
 2. hamming_loss to evaluate text classification, sentiment analysis and emotional analysis
 
 To run the application, the following command needs to be executed to install all the packages needed:
-** pip install -r requirements.txt **
+``` 
+pip install -r requirements.txt 
+```
 
 This command can be executed to install the packages globally. The above command can be executed after the creation of virtual environment. Once the required libraries are installed, the back-end server can be run using the below command:
-** python3 app.py **
+```
+python3 app.py 
+```
+
 Once the server is run, you can see that the server is now available on port 5000. 
 
 To view the webpage, open a browser and type in the following URL to open the homepage:
-** http://localhost:5000/ **
+```
+http://localhost:5000/ 
+```
 On navigation to different tabs, the UI triggers different analysis to be performed. The user can type in the search keyword. On clicking the buttons, the application executes different analysis to be performed. Once the result is predicted, the UI displays the result.
