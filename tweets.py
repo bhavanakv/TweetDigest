@@ -1,6 +1,7 @@
 import snscrape.modules.twitter as sntwitter
 import re
 import logging
+import pandas as pd
 
 logger = logging.getLogger("tweets")
 logging.basicConfig(level=logging.INFO)
@@ -40,3 +41,11 @@ def get_tweets(query):
     tweets = ' '.join([item for item in tweets])
     logger.info("***Tweets: {}***".format(tweets))
     return tweets
+
+"""
+Function to retrieve tweets from the file
+@return: Dataframe containing the tweets
+"""
+def get_tweets_from_file():
+    data = pd.read_csv('static/data.csv')
+    return data
