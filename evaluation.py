@@ -21,7 +21,7 @@ Function to evaluate multi-label multi-class classification
 """
 def evaluate_classification(pred):
     # True labels
-    y_true = [['Technology'], ['Health', 'Vaccine', 'Disease'], ['Entertainment', 'TV Shows', 'Thriller']]
+    y_true = [['Technology'], ['Health', 'Vaccine', 'Disease'], ['Entertainment', 'TV Shows', 'Thriller'], ['Entertainment'], ['Politics','Domestic']]
     # Binarize the labels
     mlb = MultiLabelBinarizer()
     y_true = mlb.fit_transform(y_true)
@@ -37,7 +37,7 @@ Function to evaluate sentiment and emotional analysis
 """
 def evaluate_emotional_analyzer(pred):
     # True labels
-    y_true = [['Positive', 'happy', 'excited', 'satisfied'], ['Negative', 'sad'], ['Neutral', 'curious']]
+    y_true = [['Positive', 'happy', 'excited', 'satisfied'], ['Negative', 'sad'], ['Neutral', 'curious'], ['Positive', 'confident', 'excited'], ['Neutral', 'curious']]
     # Binarize the labels
     mlb = MultiLabelBinarizer()
     y_true = mlb.fit_transform(y_true)

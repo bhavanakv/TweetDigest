@@ -44,8 +44,7 @@ def summarize_bart(keyword):
     bart_summarizer = ts.pipeline("summarization", model=model, tokenizer=tokenizer)
     logging.info("***Fetching tweets***")
     # Calling function to fetch tweets
-    #tweets_data = tweets.get_tweets(keyword)
-    tweets_data = keyword 
+    tweets_data = tweets.get_tweets(keyword)
     # Summarizing tweets fetched and returning summary
     bart_summary = analysis.bart_analysis(bart_summarizer, tweets_data)
     logging.info("***Completed generating summary and returning the summary***")
@@ -85,8 +84,8 @@ def multi_level_classify(keyword):
     labels = ['Health','Technology', 'Politics', 'Entertainment', 'Sports', 'Science']
     logger.debug("***Starting first-level classification***")
     tree = {
-        'Health': ['Vaccine', 'Disease'],
-        'Technology': ['Hardware', 'Software', 'AI', 'Computer'],
+        'Health': ['Disease','Nutrition','Diet'],
+        'Technology': ['Hardware', 'Software', 'AI'],
         'Politics': ['Domestic', 'International'],
         'Entertainment': {
             'Movies': ['Drama', 'Comedy', 'Action'], 
@@ -99,9 +98,9 @@ def multi_level_classify(keyword):
         },
         'Science': ['Physics', 'Chemistry', 'Biology']
     }
-    tweets_data = 'US Election is going to be in 2024. The election is held accross the united states. The votes are collected and then counted and the next president is revealed. There would be lots of music and dancing once the winner is revealed.' + 'A famous pop star will be seen. All the fampus songs wil be played for everyone to watch'
+    tweets_data = tweets.get_tweets(keyword)
     # Classification of tweets based on the first-level labels
-    response = classifier(keyword, labels)
+    response = classifier(tweets_data, labels)
     logger.info(f"***Response from classification model: {response}***" )
     classified_labels = {}
     for i in range(len(response['scores'])):
@@ -184,8 +183,9 @@ def sentiment_emotional_analysis(keyword):
     }
     # Sentiment and emotional models
     logger.info("***Performing sentiment and emotional analysis***")
-    sentiment_label = label_dict[sentiment_analyzer(keyword)[0]['label']]
-    response = emotion_analyzer(keyword, tree[sentiment_label])
+    tweets_data = tweets.get_tweets(keyword)
+    sentiment_label = label_dict[sentiment_analyzer(tweets_data)[0]['label']]
+    response = emotion_analyzer(tweets_data, tree[sentiment_label])
     emotion_labels = []
     # Best emotions are picked
     for i in range(len(response['scores'])):
@@ -196,4 +196,3 @@ def sentiment_emotional_analysis(keyword):
     response_label[sentiment_label] = emotion_labels
     # Returning sentiment and emotion labels as text to display and dictionary for evaluation
     return nested_dict_to_text(response_label), response_label
-
